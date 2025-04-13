@@ -1,46 +1,46 @@
 import random
 
-# 🟢 Motimove – Seu motivador de movimento diário!
+# ✅ Motimove – Seu motivador diário de atividade física!
 
-# Variável para armazenar os pontos do usuário ao longo da semana
-pontos_semanais = []
+# Lista para armazenar as pontuações do dia (não persiste)
+atividades_do_dia = []
 
-# Função para coletar dados básicos do usuário
+# Coleta os dados iniciais do usuário
 def boas_vindas():
-    print("🟢 Bem-vindo ao Motimove – Seu motivador de movimento diário!")
-    nome = input("Digite seu nome: ")
-    idade = input("Digite sua idade: ")
-    genero = input("Digite seu gênero: ")
-    estado = input("Digite seu estado: ")
-    bairro = input("Digite seu bairro: ")
-    
-    print(f"\nOlá, {nome}! Vamos te ajudar a se manter ativo!\n")
+    print("🏃‍♂️ Bem-vindo ao MotiMove!")
+    nome = input("Nome: ")
+    input("Idade: ")
+    input("Gênero: ")
+    input("Estado: ")
+    input("Bairro: ")
+    print(f"\nOlá, {nome}! Pronto para se movimentar hoje?\n")
     return nome
 
-# Sugestão de locais para atividade física
+# Sugestões simples de locais
 def recomendar_locais():
-    print("📍 Sugestões de locais próximos para treinar:")
-    print("- Praça pública (boa para caminhada ou corrida)")
+    print("📍 Sugestões de locais para treinar:")
+    print("- Praça pública")
     print("- Academia do bairro")
-    print("- Centro de artes marciais")
-    print("- Ciclovia ou parque para pedalar\n")
+    print("- Centro de lutas")
+    print("- Ciclovia ou parque")
+    print("- 🏠 Treino em casa (com vídeos ou apps)\n")
 
-# Função que registra a atividade física feita
+# Registro de atividade do dia
 def registrar_atividade():
-    tipo = input("Qual atividade você fez? (corrida, academia, luta, caminhada, outro): ").lower()
-    tempo = int(input("Quantos minutos você praticou? "))
-
+    print("Tipos: corrida, academia, luta, caminhada, treino em casa, treino personalizado, outro")
+    tipo = input("Atividade feita hoje: ").lower()
+    tempo = int(input("Quantos minutos? "))
     distancia = 0
+
     if tipo == "corrida":
-        distancia = float(input("Quantos quilômetros você correu? "))
+        distancia = float(input("Distância (km): "))
 
     pontos = calcular_pontos(tipo, tempo, distancia)
-    pontos_semanais.append(pontos)
-
-    print(f"\n✅ Você ganhou {pontos} pontos hoje!")
+    atividades_do_dia.append(pontos)
+    print(f"✅ Você ganhou {pontos} pontos nesta atividade!\n")
     return pontos
 
-# Função de pontuação por tipo de atividade
+# Cálculo de pontos
 def calcular_pontos(tipo, tempo, distancia=0):
     if tipo == "corrida":
         return tempo + int(distancia * 10)
@@ -50,47 +50,34 @@ def calcular_pontos(tipo, tempo, distancia=0):
         return tempo + 8
     elif tipo == "caminhada":
         return int(tempo * 0.8)
+    elif tipo == "treino em casa":
+        return tempo + 4
+    elif tipo == "treino personalizado":
+        return tempo + 6
     else:
         return tempo
 
-# Função que mostra pontuação total e ranking fictício com amigos
-def mostrar_status(nome, pontos_hoje):
-    total = sum(pontos_semanais)
-    
-    # Simulando pontuação de amigos
+# Ranking do dia entre amigos (simulado)
+def mostrar_ranking(nome):
+    total = sum(atividades_do_dia)
     amigos = {
         "Ana": random.randint(50, 150),
         "Carlos": random.randint(50, 150),
         "Bruno": random.randint(50, 150),
         nome: total
     }
-
-    # Criar ranking ordenado
     ranking = sorted(amigos.items(), key=lambda x: x[1], reverse=True)
     posicao = [i for i, (n, _) in enumerate(ranking, 1) if n == nome][0]
 
-    print(f"\n📊 {nome}, você tem {total} pontos acumulados essa semana.")
-    print(f"🥇 Sua colocação entre os amigos hoje é: {posicao}º lugar\n")
-
-# Função que mostra o relatório semanal de pontos
-def gerar_relatorio_semanal(nome):
-    print(f"\n📅 Relatório semanal de {nome}")
-    dias = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"]
-    for i, pontos in enumerate(pontos_semanais):
-        dia = dias[i] if i < len(dias) else f"Dia {i+1}"
-        print(f"- {dia}: {pontos} pontos")
-    print(f"➡️ Total da semana: {sum(pontos_semanais)} pontos\n")
+    print(f"📊 Hoje você somou: {total} pontos")
+    print(f"🏅 Posição no ranking diário: {posicao}º lugar\n")
 
 # Execução principal
-nome_usuario = boas_vindas()
+nome = boas_vindas()
 recomendar_locais()
 
-continuar = "s"
-while continuar.lower() == "s":
-    pontos_hoje = registrar_atividade()
-    mostrar_status(nome_usuario, pontos_hoje)
-    continuar = input("Deseja registrar outra atividade? (s/n): ")
+while input("Registrar uma atividade de hoje? (s/n): ").lower() == "s":
+    registrar_atividade()
+    mostrar_ranking(nome)
 
-# Ao final, mostra o relatório completo
-gerar_relatorio_semanal(nome_usuario)
-print("Obrigado por usar o Motimove! Continue se movimentando com a gente! 💪")
+print("💪 Parabéns por se manter ativo hoje com o MotiMove!")
