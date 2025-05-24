@@ -1,47 +1,89 @@
+# Versao 1: App de Terminal com CRUD e Persistencia em Arquivos
+
+import json
+import os# Versao 1: App de Terminal com CRUD e Persistencia em Arquivos
+
+import json
+import os
 import random
 
-# ✅ Motimove – Seu motivador diário de atividade física!
+ARQUIVO_DADOS = 'usuarios.json'
 
-# Lista para armazenar as pontuações do dia (não persiste)
-atividades_do_dia = []
+# ----------------- Utilitários -----------------
+def carregar_dados():
+    if os.path.exists(ARQUIVO_DADOS):
+        with open(ARQUIVO_DADOS, 'r') as f:
+            return json.load(f)
+    return {}
 
-# Coleta os dados iniciais do usuário
-def boas_vindas():
-    print("🏃‍♂️ Bem-vindo ao MotiMove!")
+def salvar_dados(dados):
+    with open(ARQUIVO_DADOS, 'w') as f:
+        json.dump(dados, f, indent=4)
+
+# ----------------- CRUD -----------------
+def criar_usuario(dados):
     nome = input("Nome: ")
-    input("Idade: ")
-    input("Gênero: ")
-    input("Estado: ")
-    input("Bairro: ")
-    print(f"\nOlá, {nome}! Pronto para se movimentar hoje?\n")
-    return nome
+    idade = input("Idade: ")
+    genero = input("Gênero: ")
+    estado = input("Estado: ")
+    bairro = input("Bairro: ")
+    dados[nome] = {
+        'idade': idade,
+        'genero': genero,
+        'estado': estado,
+        'bairro': bairro,
+        'atividades': []
+    }
+    salvar_dados(dados)
+    print(f"Usuário {nome} criado com sucesso!\n")
 
-# Sugestões simples de locais
-def recomendar_locais():
-    print("📍 Sugestões de locais para treinar:")
-    print("- Praça pública")
-    print("- Academia do bairro")
-    print("- Centro de lutas")
-    print("- Ciclovia ou parque")
-    print("- 🏠 Treino em casa (com vídeos ou apps)\n")
+def listar_usuarios(dados):
+    if not dados:
+        print("Nenhum usuário encontrado.")
+        return
+    for i, nome in enumerate(dados):
+        print(f"{i+1}. {nome} - {dados[nome]['estado']}/{dados[nome]['bairro']}")
 
-# Registro de atividade do dia
-def registrar_atividade():
-    print("Tipos: corrida, academia, luta, caminhada, treino em casa, treino personalizado, outro")
-    tipo = input("Atividade feita hoje: ").lower()
-    tempo = int(input("Quantos minutos? "))
+def atualizar_usuario(dados):
+    nome = input("Nome do usuário a atualizar: ")
+    if nome in dados:
+        dados[nome]['idade'] = input("Nova idade: ")
+        dados[nome]['genero'] = input("Novo gênero: ")
+        dados[nome]['estado'] = input("Novo estado: ")
+        dados[nome]['bairro'] = input("Novo bairro: ")
+        salvar_dados(dados)
+        print("Usuário atualizado com sucesso!\n")
+    else:
+        print("Usuário não encontrado.\n")
+
+def deletar_usuario(dados):
+    nome = input("Nome do usuário a deletar: ")
+    if nome in dados:
+        del dados[nome]
+        salvar_dados(dados)
+        print("Usuário deletado.\n")
+    else:
+        print("Usuário não encontrado.\n")
+
+# ----------------- Atividades -----------------
+def registrar_atividade(dados):
+    nome = input("Nome do usuário: ")
+    if nome not in dados:
+        print("Usuário não encontrado.\n")
+        return
+
+    tipo = input("Atividade (corrida, academia, luta, caminhada, casa, personalizado, outro): ").lower()
+    tempo = int(input("Tempo (min): "))
     distancia = 0
-
     if tipo == "corrida":
         distancia = float(input("Distância (km): "))
 
     pontos = calcular_pontos(tipo, tempo, distancia)
-    atividades_do_dia.append(pontos)
-    print(f"✅ Você ganhou {pontos} pontos nesta atividade!\n")
-    return pontos
+    dados[nome]['atividades'].append({'tipo': tipo, 'tempo': tempo, 'distancia': distancia, 'pontos': pontos})
+    salvar_dados(dados)
+    print(f"Atividade registrada! Pontos ganhos: {pontos}\n")
 
-# Cálculo de pontos
-def calcular_pontos(tipo, tempo, distancia=0):
+def calcular_pontos(tipo, tempo, distancia):
     if tipo == "corrida":
         return tempo + int(distancia * 10)
     elif tipo == "academia":
@@ -50,34 +92,195 @@ def calcular_pontos(tipo, tempo, distancia=0):
         return tempo + 8
     elif tipo == "caminhada":
         return int(tempo * 0.8)
-    elif tipo == "treino em casa":
+    elif tipo == "casa":
         return tempo + 4
-    elif tipo == "treino personalizado":
+    elif tipo == "personalizado":
         return tempo + 6
     else:
         return tempo
 
-# Ranking do dia entre amigos (simulado)
-def mostrar_ranking(nome):
-    total = sum(atividades_do_dia)
-    amigos = {
-        "Ana": random.randint(50, 150),
-        "Carlos": random.randint(50, 150),
-        "Bruno": random.randint(50, 150),
-        nome: total
+def mostrar_ranking(dados):
+    print("\n🏆 Ranking Diário")
+    placar = {}
+    for nome, info in dados.items():
+        total = sum([a['pontos'] for a in info['atividades']])
+        placar[nome] = total
+    placar = dict(sorted(placar.items(), key=lambda x: x[1], reverse=True))
+    for i, (nome, pontos) in enumerate(placar.items(), 1):
+        print(f"{i}. {nome} - {pontos} pontos")
+
+# ----------------- Menu Principal -----------------
+def menu():
+    dados = carregar_dados()
+    opcoes = {
+        '1': criar_usuario,
+        '2': listar_usuarios,
+        '3': atualizar_usuario,
+        '4': deletar_usuario,
+        '5': registrar_atividade,
+        '6': mostrar_ranking
     }
-    ranking = sorted(amigos.items(), key=lambda x: x[1], reverse=True)
-    posicao = [i for i, (n, _) in enumerate(ranking, 1) if n == nome][0]
+    while True:
+        print("""
+MotiMove - Menu Principal
+1. Criar usuário
+2. Listar usuários
+3. Atualizar usuário
+4. Deletar usuário
+5. Registrar atividade
+6. Ver ranking
+0. Sair
+""")
+        escolha = input("Escolha uma opção: ")
+        if escolha == '0':
+            break
+        elif escolha in opcoes:
+            try:
+                opcoes[escolha](dados)
+            except Exception as e:
+                print(f"Erro: {e}\n")
+        else:
+            print("Opção inválida.\n")
 
-    print(f"📊 Hoje você somou: {total} pontos")
-    print(f"🏅 Posição no ranking diário: {posicao}º lugar\n")
+if __name__ == "__main__":
+    menu()
 
-# Execução principal
-nome = boas_vindas()
-recomendar_locais()
+import random
 
-while input("Registrar uma atividade de hoje? (s/n): ").lower() == "s":
-    registrar_atividade()
-    mostrar_ranking(nome)
+ARQUIVO_DADOS = 'usuarios.json'
 
-print("💪 Parabéns por se manter ativo hoje com o MotiMove!")
+# ----------------- Utilitários -----------------
+def carregar_dados():
+    if os.path.exists(ARQUIVO_DADOS):
+        with open(ARQUIVO_DADOS, 'r') as f:
+            return json.load(f)
+    return {}
+
+def salvar_dados(dados):
+    with open(ARQUIVO_DADOS, 'w') as f:
+        json.dump(dados, f, indent=4)
+
+# ----------------- CRUD -----------------
+def criar_usuario(dados):
+    nome = input("Nome: ")
+    idade = input("Idade: ")
+    genero = input("Gênero: ")
+    estado = input("Estado: ")
+    bairro = input("Bairro: ")
+    dados[nome] = {
+        'idade': idade,
+        'genero': genero,
+        'estado': estado,
+        'bairro': bairro,
+        'atividades': []
+    }
+    salvar_dados(dados)
+    print(f"Usuário {nome} criado com sucesso!\n")
+
+def listar_usuarios(dados):
+    if not dados:
+        print("Nenhum usuário encontrado.")
+        return
+    for i, nome in enumerate(dados):
+        print(f"{i+1}. {nome} - {dados[nome]['estado']}/{dados[nome]['bairro']}")
+
+def atualizar_usuario(dados):
+    nome = input("Nome do usuário a atualizar: ")
+    if nome in dados:
+        dados[nome]['idade'] = input("Nova idade: ")
+        dados[nome]['genero'] = input("Novo gênero: ")
+        dados[nome]['estado'] = input("Novo estado: ")
+        dados[nome]['bairro'] = input("Novo bairro: ")
+        salvar_dados(dados)
+        print("Usuário atualizado com sucesso!\n")
+    else:
+        print("Usuário não encontrado.\n")
+
+def deletar_usuario(dados):
+    nome = input("Nome do usuário a deletar: ")
+    if nome in dados:
+        del dados[nome]
+        salvar_dados(dados)
+        print("Usuário deletado.\n")
+    else:
+        print("Usuário não encontrado.\n")
+
+# ----------------- Atividades -----------------
+def registrar_atividade(dados):
+    nome = input("Nome do usuário: ")
+    if nome not in dados:
+        print("Usuário não encontrado.\n")
+        return
+
+    tipo = input("Atividade (corrida, academia, luta, caminhada, casa, personalizado, outro): ").lower()
+    tempo = int(input("Tempo (min): "))
+    distancia = 0
+    if tipo == "corrida":
+        distancia = float(input("Distância (km): "))
+
+    pontos = calcular_pontos(tipo, tempo, distancia)
+    dados[nome]['atividades'].append({'tipo': tipo, 'tempo': tempo, 'distancia': distancia, 'pontos': pontos})
+    salvar_dados(dados)
+    print(f"Atividade registrada! Pontos ganhos: {pontos}\n")
+
+def calcular_pontos(tipo, tempo, distancia):
+    if tipo == "corrida":
+        return tempo + int(distancia * 10)
+    elif tipo == "academia":
+        return tempo + 5
+    elif tipo == "luta":
+        return tempo + 8
+    elif tipo == "caminhada":
+        return int(tempo * 0.8)
+    elif tipo == "casa":
+        return tempo + 4
+    elif tipo == "personalizado":
+        return tempo + 6
+    else:
+        return tempo
+
+def mostrar_ranking(dados):
+    print("\n🏆 Ranking Diário")
+    placar = {}
+    for nome, info in dados.items():
+        total = sum([a['pontos'] for a in info['atividades']])
+        placar[nome] = total
+    placar = dict(sorted(placar.items(), key=lambda x: x[1], reverse=True))
+    for i, (nome, pontos) in enumerate(placar.items(), 1):
+        print(f"{i}. {nome} - {pontos} pontos")
+
+# ----------------- Menu Principal -----------------
+def menu():
+    dados = carregar_dados()
+    opcoes = {
+        '1': criar_usuario,
+        '2': listar_usuarios,
+        '3': atualizar_usuario,
+        '4': deletar_usuario,
+        '5': registrar_atividade,
+        '6': mostrar_ranking
+    }
+    while True:
+        print("""
+MotiMove - Menu Principal
+1. Criar usuário
+2. Listar usuários
+3. Atualizar usuário
+4. Deletar usuário
+5. Registrar atividade
+6. Ver ranking
+0. Sair
+""")
+        escolha = input("Escolha uma opção: ")
+        if escolha == '0':
+            break
+        elif escolha in opcoes:
+            try:
+                opcoes[escolha](dados)
+            except Exception as e:
+                print(f"Erro: {e}\n")
+        else:
+            print("Opção inválida.\n")
+
+if __name__ == "__main__":
+    menu()
