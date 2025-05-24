@@ -12,5 +12,19 @@
                 "pontos": 75
             }
         ]
+    },
+    "Nilton": {
+        "idade": "24",
+        "genero": "Masculino",
+        "estado": "Pernambuco",
+        "bairro": "Jord\u00e3o",
+        "atividades": [
+            {
+                "tipo": "academia",
+                "tempo": 50,
+                "distancia": 0,
+                "pontos": 55
+            }
+        ]
     }
 }
