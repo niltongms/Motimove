@@ -163,4 +163,3 @@ As ações envolvem:
 Para dúvidas, sugestões ou contribuições, abra uma issue no GitHub ou envie mensagem para o mantenedor.
 
 ---
-
