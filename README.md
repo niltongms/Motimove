@@ -1,4 +1,4 @@
-﻿## MotiMove – Motivação em Movimento 
+## MotiMove – Motivação em Movimento 
 
 Uma solução tecnológica que busca tornar a prática esportiva mais **engajadora e acessível**.  
 A plataforma propõe um sistema **gamificado de desafios e recompensas**, estimulando a constância e promovendo a conexão entre os usuários.
@@ -127,6 +127,20 @@ O arquivo `usuarios.json` mantém um dicionário no formato:
 
 ---
 
+## Manipulação de Arquivos 
+
+O Motimove utiliza manipulação de arquivos para garantir que os dados dos usuários e suas atividades sejam persistidos entre sessões. Toda alteração (como adicionar, editar ou excluir um usuário ou atividade) é salva em um arquivo chamado usuarios.json.
+
+As ações envolvem:
+
+* Leitura do arquivo JSON ao iniciar o programa;
+
+* Escrita e atualização do arquivo após operações CRUD;
+
+* Armazenamento permanente das informações em disco, não apenas em memória.
+
+---
+
 ## Observações importantes
 
 * Sempre encerre o programa normalmente para garantir que os dados sejam salvos no arquivo JSON.
@@ -149,5 +163,4 @@ O arquivo `usuarios.json` mantém um dicionário no formato:
 Para dúvidas, sugestões ou contribuições, abra uma issue no GitHub ou envie mensagem para o mantenedor.
 
 ---
-
 
