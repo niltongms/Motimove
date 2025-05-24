@@ -1,8 +1,3 @@
-# Versao 1: App de Terminal com CRUD e Persistencia em Arquivos
-
-import json
-import os# Versao 1: App de Terminal com CRUD e Persistencia em Arquivos
-
 import json
 import os
 import random
