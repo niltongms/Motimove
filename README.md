@@ -60,7 +60,7 @@ source .venv/bin/activate  # Linux / macOS
 Execute o script principal no terminal:
 
 ```bash
-python3 motimove_terminal.py
+python3 motimove.py
 ```
 
 ---
