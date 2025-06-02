@@ -149,7 +149,7 @@ As ações envolvem:
 
 ---
 
-## Próximos passos (opcional)
+## Próximos passos
 
 * Adicionar autenticação de usuários
 * Implementar histórico completo de atividades
